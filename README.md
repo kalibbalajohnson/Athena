@@ -54,7 +54,7 @@ athena/
 
 ```bash
 # 1. Get the code
-git clone <your-repo-url> athena
+git clone https://github.com/kalibbalajohnson/Athena.git
 cd athena
 
 # 2. Create and activate a virtual environment

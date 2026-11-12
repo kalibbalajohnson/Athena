@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 google-genai
-pypdfpython-dotenv
+pypdf
 python-docx
-python-multipart
+python-dotenv
 python-multipart

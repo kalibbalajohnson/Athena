@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Athena</title>
+<style>
+:root{
+  --bg:#f4f4f5; --surface:#fff; --surface2:#ebebed; --text:#1f1f22; --muted:#6b6b73;
+  --line:#dcdce0; --accent:#3f3f46; --user:#e7e7ea; --ring:rgba(63,63,70,.16);
+  --shadow:0 6px 24px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.06);
+  --grad:#3f3f46;
+  --err:#b3261e; --errbg:#fdeceb;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#161618; --surface:#1f1f22; --surface2:#2a2a2e; --text:#ececef; --muted:#9b9ba3;
+    --line:#35353a; --accent:#c9c9d1; --user:#2c2c31; --ring:rgba(201,201,209,.2);
+    --shadow:0 6px 24px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.4);
+    --grad:#52525b;
+    --err:#ffb4ab; --errbg:#3a1f1f;
+  }
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; display:flex; flex-direction:column; height:100dvh; color:var(--text);
+  font:16px/1.6 "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);
+  padding-top:env(safe-area-inset-top,0px);
+}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:17px;letter-spacing:-.01em}
+.mark{width:30px;height:30px;border-radius:10px;background:var(--grad);display:grid;place-items:center;flex:none;box-shadow:none}
+.mark svg{width:17px;height:17px;fill:#fff}
+.ghost{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:500;transition:background .15s,border-color .15s}
+.ghost:hover{background:var(--surface2)}
+.right{display:flex;gap:8px}
+a.ghost{text-decoration:none;color:inherit}
+.ghost svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+main{flex:1;overflow-y:auto;display:flex;flex-direction:column;scroll-behavior:smooth}
+.col{width:100%;max-width:780px;margin:0 auto;padding:0 20px}
+
+#hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 20px 8px}
+#hero h1{margin:18px 0 6px;font-size:clamp(30px,5.4vw,46px);line-height:1.12;font-weight:600;letter-spacing:-.025em;color:var(--text)}
+#hero p{margin:0 0 30px;color:var(--muted);font-size:17px}
+.hero-mark{width:64px;height:64px;border-radius:20px;background:var(--grad);display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.16)}
+.hero-mark svg{width:34px;height:34px;fill:#fff}
+.chips{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:640px}
+.chip{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:14px 16px;font-size:15px;line-height:1.4;box-shadow:0 1px 2px rgba(40,50,100,.05);transition:transform .15s,box-shadow .15s,border-color .15s}
+.chip:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--accent)}
+.chip small{display:block;color:var(--muted);font-size:13px;margin-bottom:2px}
+
+#feed{padding-top:8px;padding-bottom:24px}
+.msg{display:flex;gap:14px;margin:22px 0}
+.msg.user{justify-content:flex-end}
+.bubble{background:var(--user);border-radius:22px 22px 6px 22px;padding:10px 16px;max-width:82%;white-space:pre-wrap;overflow-wrap:anywhere}
+.avatar{width:30px;height:30px;border-radius:10px;background:var(--grad);display:grid;place-items:center;flex:none;margin-top:2px}
+.avatar svg{width:16px;height:16px;fill:#fff}
+.avatar.busy{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(.88);opacity:.7}}
+.body{min-width:0;flex:1}
+.content{overflow-wrap:anywhere;animation:in .35s ease both}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.content>*:first-child{margin-top:0}.content>*:last-child{margin-bottom:0}
+.content p{margin:0 0 12px}
+.content ul,.content ol{margin:0 0 12px;padding-left:22px}
+.content li{margin:4px 0}
+.content h3,.content h4{margin:18px 0 6px;font-size:17px;line-height:1.3}
+.content strong{font-weight:600}
+.content code{font:13.5px ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;background:var(--surface2);padding:2px 6px;border-radius:6px}
+.content pre{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;overflow-x:auto;margin:0 0 12px}
+.content pre code{background:none;padding:0}
+.content blockquote{margin:0 0 12px;padding:8px 16px;border-left:3px solid var(--line);background:var(--surface);border-radius:0 12px 12px 0;color:var(--muted)}
+.src{display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--line);color:var(--accent);border-radius:999px;padding:0 10px;font-size:13.5px;font-weight:500;line-height:1.6}
+.src::before{content:"";width:12px;height:12px;background:currentColor;-webkit-mask:var(--doc) center/contain no-repeat;mask:var(--doc) center/contain no-repeat;--doc:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 2h8l6 6v14H6z'/%3E%3C/svg%3E")}
+.actions{display:flex;gap:4px;margin-top:8px}
+.icon{width:32px;height:32px;border:0;background:none;border-radius:10px;display:grid;place-items:center;color:var(--muted)}
+.icon:hover{background:var(--surface2);color:var(--text)}
+.icon svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.think{color:var(--muted);display:flex;align-items:center;gap:10px;padding-top:4px}
+.shimmer{background:linear-gradient(90deg,var(--muted) 30%,var(--text) 50%,var(--muted) 70%) 0 0/250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sh 1.6s linear infinite}
+@keyframes sh{to{background-position:-150% 0}}
+.err{background:var(--errbg);color:var(--err);border-radius:16px;padding:12px 16px}
+.err button{margin-top:8px;border:1px solid currentColor;background:none;border-radius:999px;padding:4px 14px;font-size:14px;color:inherit}
+
+footer{padding:6px 20px calc(clamp(36px,10vh,100px) + env(safe-area-inset-bottom,0px));transition:padding .3s ease}
+body.empty footer{padding-bottom:calc(clamp(40px,27vh,300px) + env(safe-area-inset-bottom,0px))}
+.composer{max-width:780px;margin:0 auto;display:flex;align-items:flex-end;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:8px 8px 8px 20px;box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s}
+.composer:focus-within{border-color:var(--accent);box-shadow:var(--shadow),0 0 0 4px var(--ring)}
+textarea{flex:1;border:0;outline:0;resize:none;background:none;color:var(--text);font:inherit;line-height:1.5;padding:8px 0;max-height:200px}
+textarea::placeholder{color:var(--muted)}
+#send{width:40px;height:40px;border:0;border-radius:50%;background:var(--grad);display:grid;place-items:center;flex:none;transition:transform .15s,opacity .15s}
+#send:hover:not(:disabled){transform:scale(1.07)}
+#send:disabled{background:var(--surface2);cursor:not-allowed}
+#send svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#send:disabled svg{stroke:var(--muted)}
+.note{max-width:780px;margin:8px auto 0;text-align:center;color:var(--muted);font-size:12.5px}
+
+@media (max-width:560px){
+  .chips{grid-template-columns:1fr}
+  .ghost span{display:none}
+  .bubble{max-width:90%}
+  header{padding:10px 14px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body class="empty">
+
+<header>
+  <div class="brand"><div class="mark"><svg viewBox="0 0 24 24"><path d="M12 1.5l2.6 7.9 7.9 2.6-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z"/></svg></div>Athena</div>
+  <div class="right"><a class="ghost" href="/knowledge" title="Admin only: manage documents"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Knowledge base</span></a>
+  <button class="ghost" id="new" title="Start a new chat"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>New chat</span></button></div>
+</header>
+
+<main id="scroll">
+  <section id="hero">
+    <div class="hero-mark"><svg viewBox="0 0 24 24"><path d="M12 1.5l2.6 7.9 7.9 2.6-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z"/></svg></div>
+    <h1>Hi, I'm Athena. What can I help with?</h1>
+    <p>Ask anything about the Orbit platform. Every answer names its source document.</p>
+    <div class="chips" id="chips"></div>
+  </section>
+  <div class="col" id="feed" hidden aria-live="polite"></div>
+</main>
+
+<footer>
+  <form class="composer" id="form">
+    <textarea id="q" rows="1" placeholder="Ask Athena about Orbit" aria-label="Your question" autofocus></textarea>
+    <button id="send" type="submit" disabled aria-label="Send question"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+  </form>
+  <div class="note">Athena answers only from the Orbit documents. Check important details.</div>
+</footer>
+
+<script>
+// Starter questions. All are answerable from the Orbit sample documents.
+const SUGGESTIONS = [
+  ["Architecture", "What happens, step by step, when a new order is placed?"],
+  ["Deployment", "Can I deploy on Friday at 15:00 UTC?"],
+  ["Monitoring", "When does a high error rate alert page on-call?"],
+  ["API", "How do I avoid creating duplicate orders on retry?"]
+];
+const ENDPOINT = "/ask";
+const SPARK = '<svg viewBox="0 0 24 24"><path d="M12 1.5l2.6 7.9 7.9 2.6-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z"/></svg>';
+const COPY = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+const CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+const $ = s => document.querySelector(s);
+const scroller = $("#scroll"), hero = $("#hero"), feed = $("#feed"), form = $("#form"), q = $("#q"), send = $("#send");
+let busy = false, last = "";
+
+SUGGESTIONS.forEach(([label, text]) => {
+  const b = document.createElement("button");
+  b.className = "chip"; b.type = "button";
+  b.innerHTML = "<small></small><span></span>";
+  b.firstChild.textContent = label; b.lastChild.textContent = text;
+  b.onclick = () => ask(text);
+  $("#chips").appendChild(b);
+});
+
+// ---- safe mini markdown: escape first, then format ----
+const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function inline(s){
+  const codes = [];
+  s = s.replace(/`([^`]+)`/g, (_, c) => (codes.push(c), "\u0000" + (codes.length - 1) + "\u0000"));
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/\b([\w.-]+\.(?:pdf|docx|md|txt))\b/gi, '<span class="src">$1</span>');
+  return s.replace(/\u0000(\d+)\u0000/g, (_, i) => "<code>" + codes[i] + "</code>");
+}
+function md(text){
+  const L = esc(text.replace(/\r\n/g, "\n")).split("\n");
+  let h = "", i = 0;
+  const isBlock = l => /^(```|#{1,6}\s|\s*[-*•]\s|\s*\d+[.)]\s|&gt;)/.test(l);
+  while (i < L.length){
+    const l = L[i];
+    if (!l.trim()){ i++; continue; }
+    if (/^```/.test(l)){
+      const b = []; i++;
+      while (i < L.length && !/^```/.test(L[i])) b.push(L[i++]);
+      i++; h += "<pre><code>" + b.join("\n") + "</code></pre>"; continue;
+    }
+    let m;
+    if ((m = l.match(/^#{1,6}\s+(.*)/))){ h += "<h3>" + inline(m[1]) + "</h3>"; i++; continue; }
+    if (/^&gt;/.test(l)){
+      const b = [];
+      while (i < L.length && /^&gt;/.test(L[i])) b.push(L[i++].replace(/^&gt;\s?/, ""));
+      h += "<blockquote>" + inline(b.join(" ")) + "</blockquote>"; continue;
+    }
+    const ul = /^\s*[-*•]\s+/, ol = /^\s*\d+[.)]\s+/;
+    if (ul.test(l) || ol.test(l)){
+      const re = ul.test(l) ? ul : ol, tag = re === ul ? "ul" : "ol", it = [];
+      while (i < L.length && re.test(L[i])) it.push("<li>" + inline(L[i++].replace(re, "")) + "</li>");
+      h += "<" + tag + ">" + it.join("") + "</" + tag + ">"; continue;
+    }
+    const p = [];
+    while (i < L.length && L[i].trim() && !isBlock(L[i])) p.push(L[i++]);
+    h += "<p>" + inline(p.join(" ")) + "</p>";
+  }
+  return h;
+}
+
+// ---- UI helpers ----
+function show(){ hero.hidden = true; feed.hidden = false; document.body.classList.remove("empty"); }
+function toBottom(){ scroller.scrollTop = scroller.scrollHeight; }
+function add(html, cls){
+  const d = document.createElement("article");
+  d.className = "msg " + cls; d.innerHTML = html;
+  feed.appendChild(d); toBottom(); return d;
+}
+function fit(){
+  q.style.height = "auto";
+  q.style.height = Math.min(q.scrollHeight, 200) + "px";
+  send.disabled = busy || !q.value.trim();
+}
+
+async function ask(text){
+  text = (text || "").trim();
+  if (!text || busy) return;
+  busy = true; last = text; show();
+  q.value = ""; fit();
+
+  const u = add("<div class='bubble'></div>", "user");
+  u.firstChild.textContent = text;
+
+  const a = add("<div class='avatar busy'>" + SPARK + "</div><div class='body'><div class='think'><span class='shimmer'>Reading your documents</span></div></div>", "bot");
+  const body = a.querySelector(".body"), av = a.querySelector(".avatar"), status = a.querySelector(".shimmer");
+  const steps = ["Finding the relevant passages", "Writing your answer"];
+  let n = 0;
+  const tick = setInterval(() => { if (n < steps.length) status.textContent = steps[n++]; }, 1800);
+
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), 90000);
+  try {
+    const res = await fetch(ENDPOINT, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: text }), signal: ctl.signal
+    });
+    let data;
+    try { data = await res.json(); } catch { data = { detail: "The server sent an unreadable response (status " + res.status + ")." }; }
+    if (!res.ok) throw new Error(data.detail || "Request failed (status " + res.status + ").");
+    const answer = data.answer || "No answer came back. Try rephrasing your question.";
+    body.innerHTML = "<div class='content'></div><div class='actions'><button class='icon' title='Copy answer' aria-label='Copy answer'>" + COPY + "</button></div>";
+    body.firstChild.innerHTML = md(answer);
+    const cp = body.querySelector(".icon");
+    cp.onclick = async () => {
+      try { await navigator.clipboard.writeText(answer); cp.innerHTML = CHECK; cp.title = "Copied"; setTimeout(() => { cp.innerHTML = COPY; cp.title = "Copy answer"; }, 1600); } catch {}
+    };
+  } catch (e) {
+    const msg = e.name === "AbortError" ? "The request took too long. Try again." : e.message;
+    body.innerHTML = "<div class='err'><strong>Couldn't get an answer.</strong><div></div><button type='button'>Try again</button></div>";
+    body.querySelector(".err div").textContent = msg;
+    body.querySelector("button").onclick = () => { a.remove(); u.remove(); busy = false; ask(last); };
+  } finally {
+    clearInterval(tick); clearTimeout(t);
+    av.classList.remove("busy"); busy = false; fit(); toBottom(); q.focus();
+  }
+}
+
+form.addEventListener("submit", e => { e.preventDefault(); ask(q.value); });
+q.addEventListener("input", fit);
+q.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); ask(q.value); }
+});
+$("#new").onclick = () => { if (busy) return; feed.innerHTML = ""; feed.hidden = true; hero.hidden = false; document.body.classList.add("empty"); q.value = ""; fit(); q.focus(); };
+fit();
+</script>
+</body>
+</html>

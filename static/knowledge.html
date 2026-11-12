@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Athena - Knowledge base</title>
+<style>
+:root{--bg:#f4f4f5;--surface:#fff;--surface2:#ebebed;--text:#1f1f22;--muted:#6b6b73;--line:#dcdce0;--accent:#3f3f46;--sel:#e7e7ea;--ring:rgba(63,63,70,.16);--shadow:0 6px 24px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.06);--grad:#3f3f46}
+@media (prefers-color-scheme:dark){:root{--bg:#161618;--surface:#1f1f22;--surface2:#2a2a2e;--text:#ececef;--muted:#9b9ba3;--line:#35353a;--accent:#c9c9d1;--sel:#2c2c31;--ring:rgba(201,201,209,.2);--shadow:0 6px 24px rgba(0,0,0,.45),0 1px 2px rgba(0,0,0,.4);--grad:#52525b}}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;display:flex;flex-direction:column;height:100dvh;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;padding-top:env(safe-area-inset-top,0px)}
+button,input,textarea{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:17px}
+.brand span{color:var(--muted);font-weight:400}
+.mark{width:30px;height:30px;border-radius:10px;background:var(--grad);display:grid;place-items:center}
+.mark svg{width:17px;height:17px;fill:#fff}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:500;font-size:14px;text-decoration:none;color:inherit}
+.btn:hover:not(:disabled){background:var(--surface2)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.pri{background:var(--grad);border-color:transparent;color:#fff}.btn.pri:hover:not(:disabled){background:var(--grad);filter:brightness(1.12)}
+.app{flex:1;min-height:0;display:grid;grid-template-columns:330px 1fr;gap:16px;padding:0 20px calc(20px + env(safe-area-inset-bottom,0px))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.tools{padding:14px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--line)}
+.tools input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:8px 12px;outline:0}
+.tools input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+.tb{display:flex;gap:6px}
+.ib{width:34px;height:34px;border:0;background:none;border-radius:10px;display:grid;place-items:center;color:var(--muted)}
+.ib:hover{background:var(--surface2);color:var(--text)}
+svg.i{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#tree{flex:1;overflow:auto;padding:8px}
+.row{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;cursor:pointer;user-select:none}
+.row:hover{background:var(--surface2)}.row.sel{background:var(--sel)}
+.nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta{color:var(--muted);font-size:12px}
+.row .del{opacity:0;border:0;background:none;color:var(--muted);padding:2px;border-radius:6px;display:grid}
+.row:hover .del,.row:focus-within .del{opacity:1}.del:hover{color:#b3261e}
+.chev{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2.2;flex:none;transition:transform .15s}.chev.o{transform:rotate(90deg)}
+.sp{width:14px;flex:none}
+.ext{font-size:10px;font-weight:700;letter-spacing:.03em;border:1px solid var(--line);border-radius:6px;padding:1px 5px;color:var(--muted);min-width:38px;text-align:center}
+.stats{padding:10px 16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+.none{padding:24px 12px;text-align:center;color:var(--muted)}
+.ehead{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+#crumb{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#crumb i{color:var(--muted);font-style:normal;font-weight:400;margin:0 2px}
+.badge{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 10px}
+#dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+#ed{flex:1;width:100%;border:0;outline:0;resize:none;background:none;padding:18px 20px;font:14px/1.7 ui-monospace,"Cascadia Code",Menlo,Consolas,monospace}
+#ed[readonly]{color:var(--muted)}
+.efoot{padding:8px 16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+#empty{flex:1;display:grid;place-items:center;text-align:center;color:var(--muted);padding:24px}
+#empty b{display:block;color:var(--text);font-size:18px;margin-bottom:4px}
+#pane{flex:1;display:flex;flex-direction:column;min-height:0}
+[hidden]{display:none!important}
+dialog{border:0;border-radius:20px;padding:22px;background:var(--surface);color:var(--text);box-shadow:var(--shadow);width:min(420px,90vw)}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+dialog h2{margin:0 0 6px;font-size:18px}dialog p{margin:0 0 14px;color:var(--muted)}
+dialog input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;outline:0;margin-bottom:16px}
+.acts{display:flex;justify-content:flex-end;gap:8px}
+#toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--grad);color:#fff;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;box-shadow:var(--shadow);max-width:90vw}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media (max-width:760px){.app{grid-template-columns:1fr;grid-template-rows:minmax(0,42%) minmax(0,1fr)}.btn span{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="mark"><svg viewBox="0 0 24 24"><path d="M12 1.5l2.6 7.9 7.9 2.6-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z"/></svg></div>Athena <span>/ Knowledge base</span></div>
+  <a class="btn" href="/"><svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg><span>Back to chat</span></a>
+</header>
+
+<div class="app">
+  <section class="panel" aria-label="Files">
+    <div class="tools">
+      <input id="f" type="search" placeholder="Search files" aria-label="Search files">
+      <div class="tb">
+        <button class="btn" id="nf"><svg class="i" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 12v6M9 15h6"/></svg><span>File</span></button>
+        <button class="btn" id="nd"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5h5"/></svg><span>Folder</span></button>
+        <button class="btn" id="up"><svg class="i" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg><span>Upload</span></button>
+        <input id="fi" type="file" multiple accept=".pdf,.docx,.md,.txt" hidden>
+      </div>
+    </div>
+    <div id="tree" role="tree"></div>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="panel" aria-label="Editor">
+    <div id="empty"><div><b>Select a file</b>Pick a document on the left to read or edit it.<br>Changes are used by Athena right away.</div></div>
+    <div id="pane" hidden>
+      <div class="ehead">
+        <div id="crumb"></div><span id="dot" hidden title="Unsaved changes"></span><span class="badge" id="badge"></span>
+        <button class="btn pri" id="save" disabled>Save</button>
+        <button class="ib" id="rm" title="Delete file" aria-label="Delete file"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
+      </div>
+      <textarea id="ed" spellcheck="false" aria-label="File content"></textarea>
+      <div class="efoot" id="st"></div>
+    </div>
+  </section>
+</div>
+
+<dialog id="dlg"><form method="dialog">
+  <h2 id="dt"></h2><p id="dx"></p><input id="di" autocomplete="off">
+  <div class="acts"><button type="button" class="btn" id="dc">Cancel</button><button class="btn pri" value="ok" id="dok">OK</button></div>
+</form></dialog>
+<div id="toast" role="status"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const parent = p => p.includes("/") ? p.slice(0, p.lastIndexOf("/")) : "";
+const kb = n => n < 1024 ? n + " B" : (n / 1024).toFixed(1) + " KB";
+const FOLDER = '<svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+const TRASH = '<svg class="i" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
+const chev = o => '<svg class="chev' + (o ? " o" : "") + '" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
+
+let tree = [], open = new Set(), sel = { path: "", type: "dir" }, cur = null, dirty = false, first = true;
+const ED = $("#ed"), D = $("#dlg");
+
+async function api(url, opt) {
+  const r = await fetch(url, opt); let d = {};
+  try { d = await r.json(); } catch {}
+  if (!r.ok) throw new Error(d.detail || "Error " + r.status);
+  return d;
+}
+const json = (m, b) => ({ method: m, headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) });
+let tt; function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), 2600); }
+const guard = fn => async (...a) => { try { await fn(...a); } catch (e) { toast(e.message); } };
+
+function ask({ title, text = "", value = null, ok = "OK" }) {
+  $("#dt").textContent = title; $("#dx").textContent = text; $("#dok").textContent = ok;
+  const i = $("#di"); i.hidden = value === null; i.value = value || "";
+  D.returnValue = ""; D.showModal(); if (value !== null) { i.focus(); i.select(); }
+  return new Promise(res => { D.onclose = () => res(D.returnValue === "ok" ? (value === null ? true : i.value.trim()) : null); });
+}
+$("#dc").onclick = () => D.close("cancel");
+
+function stats(n) { let f = 0, s = 0; (function w(l) { l.forEach(x => x.type === "dir" ? w(x.children) : (f++, s += x.size)); })(n); return f + " files · " + kb(s); }
+function vis(n, f) { return !f || (n.type === "file" ? n.name.toLowerCase().includes(f) : n.children.some(c => vis(c, f))); }
+function rows(list, d, f) {
+  return list.filter(n => vis(n, f)).map(n => {
+    const pad = 'style="padding-left:' + (10 + d * 18) + 'px"', c = "row" + (sel.path === n.path ? " sel" : "");
+    const del = '<button class="del" data-del="' + esc(n.path) + '" title="Delete" aria-label="Delete ' + esc(n.name) + '">' + TRASH + "</button>";
+    if (n.type === "dir") {
+      const o = f || open.has(n.path);
+      return '<div class="' + c + '" ' + pad + ' tabindex="0" role="treeitem" data-p="' + esc(n.path) + '" data-t="dir">' + chev(o) + FOLDER + '<span class="nm">' + esc(n.name) + '</span><span class="meta">' + n.children.length + "</span>" + del + "</div>" + (o ? rows(n.children, d + 1, f) : "");
+    }
+    return '<div class="' + c + '" ' + pad + ' tabindex="0" role="treeitem" data-p="' + esc(n.path) + '" data-t="file"><span class="sp"></span><span class="ext">' + esc(n.name.split(".").pop().toUpperCase()) + '</span><span class="nm">' + esc(n.name) + '</span><span class="meta">' + kb(n.size) + "</span>" + del + "</div>";
+  }).join("");
+}
+function render() {
+  const f = $("#f").value.trim().toLowerCase();
+  $("#tree").innerHTML = rows(tree, 0, f) || '<div class="none">' + (f ? "No files match." : "This knowledge base is empty.") + "</div>";
+  $("#stats").textContent = stats(tree);
+}
+async function load() {
+  tree = await api("/kb/tree");
+  if (first) { first = false; (function w(l) { l.forEach(x => x.type === "dir" && (open.add(x.path), w(x.children))); })(tree); }
+  render();
+}
+
+function status() {
+  $("#st").textContent = cur.editable ? (dirty ? "Unsaved changes · " : "") + ED.value.length.toLocaleString() + " characters"
+    : "Read-only preview of the extracted text. Upload a new version of this file to change it.";
+  $("#save").disabled = !dirty; $("#dot").hidden = !dirty;
+}
+function editor() {
+  $("#empty").hidden = !!cur; $("#pane").hidden = !cur; if (!cur) return;
+  $("#crumb").innerHTML = cur.path.split("/").map(esc).join(" <i>/</i> ");
+  $("#badge").textContent = cur.editable ? "Editable" : "Read-only";
+  ED.value = cur.orig; ED.readOnly = !cur.editable; $("#save").hidden = !cur.editable; status();
+}
+async function pick(p) {
+  if (dirty && !(await ask({ title: "Discard changes?", text: "You have unsaved edits in " + cur.path + ".", ok: "Discard" }))) return;
+  const d = await api("/kb/file?path=" + encodeURIComponent(p));
+  cur = { path: p, editable: d.editable, orig: d.content }; dirty = false; sel = { path: p, type: "file" }; editor(); render();
+}
+const target = () => sel.type === "dir" ? sel.path : parent(sel.path);
+const join = (a, b) => a ? a + "/" + b : b;
+
+async function remove(p) {
+  if (!(await ask({ title: "Delete this item?", text: '"' + p + '" will be removed from the knowledge base.', ok: "Delete" }))) return;
+  await api("/kb/item?path=" + encodeURIComponent(p), { method: "DELETE" });
+  if (cur && (cur.path === p || cur.path.startsWith(p + "/"))) { cur = null; dirty = false; editor(); }
+  sel = { path: "", type: "dir" }; await load(); toast("Deleted");
+}
+
+$("#tree").addEventListener("click", guard(async e => {
+  const d = e.target.closest("[data-del]"); if (d) return remove(d.dataset.del);
+  const r = e.target.closest(".row"); if (!r) return; const p = r.dataset.p;
+  if (r.dataset.t === "dir") { sel = { path: p, type: "dir" }; open.has(p) ? open.delete(p) : open.add(p); render(); } else await pick(p);
+}));
+$("#tree").addEventListener("keydown", e => { if (e.key === "Enter" && e.target.classList.contains("row")) e.target.click(); });
+$("#f").oninput = render;
+ED.oninput = () => { dirty = ED.value !== cur.orig; status(); };
+
+$("#save").onclick = guard(async () => {
+  await api("/kb/file", json("PUT", { path: cur.path, content: ED.value }));
+  cur.orig = ED.value; dirty = false; status(); await load(); toast("Saved. Athena is now using the latest version.");
+});
+$("#rm").onclick = guard(() => remove(cur.path));
+$("#nf").onclick = guard(async () => {
+  const fo = target(), n = await ask({ title: "New file", text: "In " + (fo || "docs") + "/ (.md or .txt)", value: "untitled.md", ok: "Create" }); if (!n) return;
+  const name = /\.(md|txt)$/i.test(n) ? n : n + ".md", p = join(fo, name);
+  await api("/kb/file", json("PUT", { path: p, content: "# " + name.replace(/\.\w+$/, "") + "\n\n" }));
+  open.add(fo); await load(); await pick(p); ED.focus();
+});
+$("#nd").onclick = guard(async () => {
+  const fo = target(), n = await ask({ title: "New folder", text: "In " + (fo || "docs") + "/", value: "new-folder", ok: "Create" }); if (!n) return;
+  const p = join(fo, n); await api("/kb/folder", json("POST", { path: p })); open.add(fo); open.add(p); sel = { path: p, type: "dir" }; await load();
+});
+$("#up").onclick = () => $("#fi").click();
+$("#fi").onchange = guard(async e => {
+  for (const f of e.target.files) { const fd = new FormData(); fd.append("file", f); await api("/kb/upload?folder=" + encodeURIComponent(target()), { method: "POST", body: fd }); }
+  e.target.value = ""; await load(); toast("Upload complete");
+});
+addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); if (cur && cur.editable && dirty) $("#save").click(); } });
+addEventListener("beforeunload", e => { if (dirty) e.preventDefault(); });
+guard(load)();
+</script>
+</body>
+</html>

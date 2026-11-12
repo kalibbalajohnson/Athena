@@ -1,0 +1,4 @@
+Canary: a release sent to a small share of production traffic first.
+ADR: Architecture Decision Record, a short document explaining a technical decision.
+Consumer lag: how far a Kafka consumer is behind the newest message.
+Idempotency key: a header that makes a repeated request return the original result.
